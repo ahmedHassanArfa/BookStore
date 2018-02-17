@@ -1,0 +1,193 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core">
+    <h:head>
+        <title>Book Store</title>
+
+    </h:head>
+    <h:body>
+        <h:form id="bookStoreForm">
+
+            <p:outputLabel value="Language" />
+            <p:selectOneMenu value="#{languageBean.localeCode}" >
+                <f:selectItem itemLabel="Arabic" itemValue="ar" />
+                <f:selectItem itemLabel="English" itemValue="en" />
+                <p:ajax listener="#{languageBean.localeCodeChanged()}" update=":bookStoreForm"/>
+            </p:selectOneMenu>
+
+            <br/>
+            <br/>
+            <br/>
+
+
+            <p:commandButton value="#{msg.ADDBOOKSECTION}" update=":bookSectionDialog" oncomplete="PF('bookSectionDialog').show();" />
+            <p:dataTable var="bookSection" value="#{bookStoreMB.bookSectionsList}" rows="10"
+                         paginator="true" 
+                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15">
+
+                <p:column style="width:16px">
+                    <p:rowToggler />
+                </p:column>
+
+
+                <p:column headerText="#{msg.ID}">
+                    <p:outputLabel value="#{bookSection.id}" />
+                </p:column>
+
+                <p:column headerText="#{msg.NAME}">
+                    <p:outputLabel value="#{bookSection.name}" />
+                </p:column>
+
+
+                <p:column headerText="#{msg.UPDATE}">
+                    <p:commandButton value="#{msg.UPDATE}" update=":bookSectionDialog" oncomplete="PF('bookSectionDialog').show();" >
+                        <f:setPropertyActionListener target="#{bookStoreMB.selectedBookSection}" value="#{bookSection}" />
+                    </p:commandButton>
+                </p:column>
+
+                <p:column headerText="#{msg.DELETE}">
+                    <p:commandButton value="#{msg.DELETE}" actionListener="#{bookStoreMB.deleteBookSection()}" update="bookStoreForm">
+                        <f:setPropertyActionListener target="#{bookStoreMB.selectedBookSection}" value="#{bookSection}"/>
+                        <p:confirm header="Confirmation" message="Are you sure?" icon="ui-icon-alert" />
+                    </p:commandButton>
+                </p:column>
+
+
+
+
+                <p:rowExpansion>
+
+
+                    <p:commandButton value="add Book" update=":bookDialog" oncomplete="PF('bookDialog').show();" >
+                        <f:setPropertyActionListener target="#{bookStoreMB.selectedBookSection}" value="#{bookSection}" />
+                    </p:commandButton>
+
+                    <p:dataTable var="book" value="#{bookStore.books}" rows="10"
+                                 paginator="true" 
+                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 rowsPerPageTemplate="5,10,15">
+
+                        <p:column style="width:16px">
+                            <p:rowToggler />
+                        </p:column>
+
+
+                        <p:column headerText="#{msg.ID}">
+                            <p:outputLabel value="#{book.id}" />
+                        </p:column>
+
+                        <p:column headerText="#{msg.TITLE}">
+                            <p:outputLabel value="#{book.title}" />
+                        </p:column>
+
+                        <p:column headerText="#{msg.AUTHOR}">
+                            <p:outputLabel value="#{book.author}" />
+                        </p:column>
+
+                        <p:column headerText="#{msg.PRICE}">
+                            <p:outputLabel value="#{book.price}" />
+                        </p:column>
+
+                        <p:column headerText="#{msg.DATE}">
+                            <p:outputLabel value="#{book.date}" />
+                        </p:column>
+
+                        <p:column headerText="#{msg.UPDATE}">
+                            <p:commandButton value="#{msg.UPDATE}" update=":bookDialog" oncomplete="PF('bookSectionDialog').show();" >
+                                <f:setPropertyActionListener target="#{booktoreMB.selectedBook}" value="#{book}" />
+                                <f:setPropertyActionListener target="#{bookStoreMB.selectedBookSection}" value="#{bookSection}" />
+                            </p:commandButton>
+                        </p:column>
+
+                        <p:column headerText="#{msg.DELETE}">
+                            <p:commandButton value="#{msg.DELETE}" actionListener="#{bookStoreMB.deleteBook()}" update=":bookStoreForm">
+                                <f:setPropertyActionListener target="#{booktoreMB.selectedBook}" value="#{book}" />
+                                <f:setPropertyActionListener target="#{bookStoreMB.selectedBookSection}" value="#{bookSection}" />
+                                <p:confirm header="Confirmation" message="Are you sure?" icon="ui-icon-alert" />
+                            </p:commandButton>
+                        </p:column>
+
+                    </p:dataTable>
+
+
+
+
+                </p:rowExpansion>
+
+
+            </p:dataTable>
+
+
+        </h:form>
+
+
+        <h:form id="bookSectionDialog">
+            <p:dialog header="Selected Book Section" widgetVar="bookSectionDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false" width="500">
+
+                <p:outputPanel id="multiCarDetail" style="text-align:center;">
+                    <p:outputLabel value="ID" />
+                    <p:inputText value="#{bookStoreMB.selectedBookSection.id}" />
+
+                    <br/>
+                    <p:outputLabel value="Name" />
+                    <p:inputText value="#{bookStoreMB.selectedBookSection.name}" />
+
+                    <br/>
+
+                    <p:commandButton value="save" update=":bookStoreForm" 
+                                     actionListener="#{bookStoreMB.saveOrUpdateBookSection()}" oncomplete="PF('bookSectionDialog').hide();"/>
+                </p:outputPanel>
+
+            </p:dialog>
+        </h:form>
+
+
+        <h:form id="bookDialog">
+            <p:dialog header="Selected Book" widgetVar="bookDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false" width="500">
+
+                <p:outputPanel id="multiCarDetail" style="text-align:center;">
+                    <p:outputLabel value="ID" />
+                    <p:inputText value="#{bookStoreMB.selectedBook.id}" />
+
+                    <br/>
+
+                    <p:outputLabel value="Title" />
+                    <p:inputText value="#{bookStoreMB.selectedBook.title}" />
+
+                    <br/>
+
+                    <p:outputLabel value="Author" />
+                    <p:inputText value="#{bookStoreMB.selectedBook.author}" />
+
+                    <br/>
+
+                    <p:outputLabel value="Price" />
+                    <p:inputText value="#{bookStoreMB.selectedBook.price}" />
+
+                    <br/>
+
+                    <p:outputLabel value="Date" />
+                    <p:calendar value="#{bookStoreMB.selectedBook.date}" />
+
+                    <br/>
+
+                    <p:commandButton value="save" update=":bookStoreForm" 
+                                     actionListener="#{bookStoreMB.saveOrUpdateBook()}" oncomplete="PF('bookDialog').hide();" />
+                </p:outputPanel>
+
+            </p:dialog>
+        </h:form>
+
+
+        <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+            <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+            <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+        </p:confirmDialog>
+
+    </h:body>
+</html>
+
